@@ -1,0 +1,6 @@
+click
+loguru
+httpx
+browser-cookie3
+pydantic==2.11.7
+requests==2.32.3

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Courexress — Coursera Fast Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="shell">
+    <!-- Ambient Background Glows -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <!-- Header Navigation Bar -->
+    <header class="navbar">
+      <div class="brand">
+        <div class="brand-mark">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="url(#brand-grad)" stroke="url(#brand-grad)" stroke-width="1.5" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="brand-grad" x1="3" y1="2" x2="21" y2="22" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#38BDF8"/>
+                <stop offset="0.5" stop-color="#818CF8"/>
+                <stop offset="1" stop-color="#C084FC"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="brand-meta">
+          <span class="brand-name">Courexress</span>
+          <span class="pill-version">PRO</span>
+        </div>
+      </div>
+
+      <div class="auth-pill" id="authStatus" title="Coursera Session Connection">
+        <span class="auth-dot"></span>
+        <span class="auth-user" id="authUserText">Checking...</span>
+      </div>
+    </header>
+
+    <!-- Segmented Navigation Controls -->
+    <nav class="segmented-control" role="tablist">
+      <button class="segment-btn active" data-tab="tab-automate" role="tab">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        <span>Accelerator</span>
+      </button>
+      <button class="segment-btn" data-tab="tab-settings" role="tab">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>AI & Settings</span>
+      </button>
+      <button class="segment-btn" data-tab="tab-privacy" role="tab">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        <span>Privacy</span>
+      </button>
+    </nav>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <main class="viewport">
+
+      <!-- TAB 1: AUTOMATE (RUNNER) -->
+      <section class="tab-pane active" id="tab-automate">
+        <!-- Target Course Glass Card -->
+        <div class="glass-card course-box">
+          <div class="card-caption">
+            <span class="caption-label">Active Target Course</span>
+            <span class="detected-chip" id="autoDetectBadge" style="display: none;">
+              <span class="dot-radar"></span>
+              Auto-Synced Tab
+            </span>
+          </div>
+
+          <div class="input-wrapper">
+            <div class="input-prefix">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </div>
+            <input type="text" id="courseInput" placeholder="Paste course link or slug..." spellcheck="false" autocomplete="off" />
+            <button id="btnPaste" class="action-mini-btn" title="Paste from clipboard">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Hero Stats Dashboard -->
+        <div class="glass-card hero-dashboard">
+          <div class="ring-and-metric">
+            <!-- Circular Progress Dial with Multi-Color Aurora Gradient -->
+            <div class="radial-ring-container">
+              <svg class="radial-ring-svg" viewBox="0 0 100 100">
+                <defs>
+                  <linearGradient id="ring-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#00F2FE"/>
+                    <stop offset="25%" stop-color="#38BDF8"/>
+                    <stop offset="55%" stop-color="#8B5CF6"/>
+                    <stop offset="85%" stop-color="#EC4899"/>
+                    <stop offset="100%" stop-color="#F59E0B"/>
+                  </linearGradient>
+                  <filter id="ring-glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                </defs>
+                <circle class="ring-track" cx="50" cy="50" r="42" />
+                <circle class="ring-fill" id="radialProgress" cx="50" cy="50" r="42" filter="url(#ring-glow)" />
+              </svg>
+              <div class="radial-center-content">
+                <span class="radial-number" id="percentText">0%</span>
+                <span class="radial-sub">COMPLETED</span>
+              </div>
+            </div>
+
+            <!-- Metric Cards Grid -->
+            <div class="hero-metric-grid">
+              <div class="micro-stat-card card-done">
+                <div class="stat-card-top">
+                  <span class="stat-badge-label">DONE</span>
+                  <span class="stat-icon-gem">✨</span>
+                </div>
+                <span class="stat-number" id="completedCount">0</span>
+                <span class="stat-sub">items cleared</span>
+              </div>
+              <div class="micro-stat-card card-remaining">
+                <div class="stat-card-top">
+                  <span class="stat-badge-label stat-amber">REMAINING</span>
+                  <span class="stat-icon-gem amber-gem">🎯</span>
+                </div>
+                <span class="stat-number" id="totalCount">0</span>
+                <span class="stat-sub">total required</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Status Message Pill -->
+          <div class="status-banner" id="statusMessageContainer">
+            <span class="pulse-indicator" id="statusDot"></span>
+            <span class="status-text" id="statusMessage">Ready to accelerate. Select start.</span>
+          </div>
+
+          <!-- Command Controls -->
+          <div class="cta-row">
+            <button id="btnStart" class="btn-glow-primary">
+              <span class="btn-shine"></span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              <span>Start Automation</span>
+            </button>
+            <button id="btnPause" class="btn-glass" style="display: none;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+              <span id="pauseText">Pause</span>
+            </button>
+            <button id="btnStop" class="btn-danger-glass" style="display: none;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16"></rect></svg>
+              <span>Halt</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Activity Stream Card -->
+        <div class="glass-card activity-stream-card">
+          <div class="stream-header">
+            <div class="stream-title">
+              <span class="live-dot"></span>
+              <span>Live Execution Log</span>
+            </div>
+            <button id="btnClearLogs" class="stream-clear-btn" title="Clear log window">Clear</button>
+          </div>
+
+          <div class="stream-viewport" id="logContainer">
+            <div class="stream-item item-info">
+              <span class="item-tag tag-info">INFO</span>
+              <span class="item-time">--:--</span>
+              <span class="item-msg">System initialized. Awaiting course trigger.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: AI & CONFIGURATION -->
+      <section class="tab-pane" id="tab-settings">
+        <!-- AI Solver Section -->
+        <div class="glass-card ai-settings-card">
+          <div class="section-title-row">
+            <div class="title-with-icon">
+              <span class="icon-sparkle">✨</span>
+              <h3>Gemini AI Intelligence Engine</h3>
+            </div>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="studio-link" title="Generate free key on Google AI Studio">
+              Get Free Key ↗
+            </a>
+          </div>
+
+          <p class="section-desc">Empowers automated problem solving for multiple-choice tests, multi-select questions, and discussion reflection prompts.</p>
+
+          <div class="api-key-input-block">
+            <label for="geminiApiKey">Your Google Gemini API Key</label>
+            <div class="input-wrapper key-wrapper">
+              <input type="password" id="geminiApiKey" placeholder="AIzaSy... (from Google AI Studio)" spellcheck="false" autocomplete="off" />
+              <button id="btnToggleApiKey" class="action-mini-btn" title="Toggle key visibility">
+                <svg id="eyeIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="privacy-callout">
+            <div class="callout-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <div class="callout-text">
+              <strong>Local-Only Encryption:</strong> Your key is stored solely on your computer inside browser memory. We have zero servers and never transmit or log your key.
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature Switches -->
+        <div class="glass-card toggles-card">
+          <h4 class="card-subtitle">Automated Capabilities</h4>
+
+          <div class="switch-row">
+            <div class="switch-info">
+              <div class="switch-title-wrap">
+                <span class="switch-icon-chip chip-violet">📝</span>
+                <span class="switch-title">Auto-Solve Quizzes & Tests</span>
+              </div>
+              <span class="switch-desc">AI computes correct choices & submits for 80%+ passing score</span>
+            </div>
+            <label class="ios-switch">
+              <input type="checkbox" id="toggleQuizzes" checked />
+              <span class="switch-thumb"></span>
+            </label>
+          </div>
+
+          <div class="switch-row">
+            <div class="switch-info">
+              <div class="switch-title-wrap">
+                <span class="switch-icon-chip chip-cyan">💬</span>
+                <span class="switch-title">Auto-Answer Discussions</span>
+              </div>
+              <span class="switch-desc">Composes thoughtful, human-grade learner reflection answers</span>
+            </div>
+            <label class="ios-switch">
+              <input type="checkbox" id="toggleDiscussions" checked />
+              <span class="switch-thumb"></span>
+            </label>
+          </div>
+
+          <div class="switch-row">
+            <div class="switch-info">
+              <div class="switch-title-wrap">
+                <span class="switch-icon-chip chip-amber">🤖</span>
+                <span class="switch-title">Complete Coach Checkpoints</span>
+              </div>
+              <span class="switch-desc">Fulfills AI coach conversational milestone items</span>
+            </div>
+            <label class="ios-switch">
+              <input type="checkbox" id="toggleCoach" checked />
+              <span class="switch-thumb"></span>
+            </label>
+          </div>
+
+          <div class="switch-row">
+            <div class="switch-info">
+              <div class="switch-title-wrap">
+                <span class="switch-icon-chip chip-emerald">⚡</span>
+                <span class="switch-title">Complete Interactive Widgets</span>
+              </div>
+              <span class="switch-desc">Marks interactive tools and practice widgets completed</span>
+            </div>
+            <label class="ios-switch">
+              <input type="checkbox" id="toggleWidgets" checked />
+              <span class="switch-thumb"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Performance Sliders -->
+        <div class="glass-card performance-card">
+          <h4 class="card-subtitle">Pacing & Concurrency</h4>
+
+          <div class="slider-block">
+            <div class="slider-header">
+              <span>Parallel Pipeline Threads</span>
+              <span class="pill-metric" id="workersVal">5 workers</span>
+            </div>
+            <input type="range" id="workersSlider" min="1" max="8" value="5" />
+          </div>
+
+          <div class="slider-block">
+            <div class="slider-header">
+              <span>Request Throttle Delay</span>
+              <span class="pill-metric" id="delayVal">250ms</span>
+            </div>
+            <input type="range" id="delaySlider" min="0" max="1000" step="50" value="250" />
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: PRIVACY & TRUST -->
+      <section class="tab-pane" id="tab-privacy">
+        <div class="glass-card trust-hero-card">
+          <div class="shield-badge">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+          </div>
+          <h3>Zero-Knowledge Architecture</h3>
+          <p class="trust-lead">Courexress operates 100% inside your browser sandbox. We believe in absolute user autonomy.</p>
+        </div>
+
+        <div class="trust-grid">
+          <div class="trust-card">
+            <div class="trust-icon">💻</div>
+            <h4>Local-First Storage</h4>
+            <p>Your API key and settings live strictly inside <code>chrome.storage.local</code> on your device.</p>
+          </div>
+
+          <div class="trust-card">
+            <div class="trust-icon">🚫</div>
+            <h4>No Remote Servers</h4>
+            <p>We do not own or maintain any telemetry servers or tracking databases. No logs are ever sent.</p>
+          </div>
+
+          <div class="trust-card">
+            <div class="trust-icon">🔗</div>
+            <h4>Direct P2P Execution</h4>
+            <p>All Coursera actions travel straight to <code>coursera.org</code>. All AI requests travel straight to <code>googleapis.com</code>.</p>
+          </div>
+
+          <div class="trust-card">
+            <div class="trust-icon">👁️</div>
+            <h4>Open & Inspectable</h4>
+            <p>Every single line of JavaScript in this extension is unminified, readable, and open for your inspection.</p>
+          </div>
+        </div>
+
+        <div class="legal-footer">
+          <span>Read the full commitment in <a href="PRIVACY.md" target="_blank">PRIVACY.md</a></span>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Status Strip -->
+    <footer class="bottom-strip">
+      <div class="strip-left">
+        <span class="secure-badge">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4 5V11.09C4 16.14 7.41 20.85 12 22C16.59 20.85 20 16.14 20 11.09V5L12 2Z"/></svg>
+          Client-Side Sandbox
+        </span>
+      </div>
+      <div class="strip-right">
+        <a href="https://github.com/aryansri-coc/courexress" target="_blank" rel="noopener" class="strip-link">Courexress Core</a>
+      </div>
+    </footer>
+  </div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

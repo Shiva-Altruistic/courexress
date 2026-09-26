@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coursera Automation</title>
+
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>Courexress</h1>
+        <p>Coursera Course Automation</p>
+        <p>
+            Set up the automation tool in just a few minutes.
+            Follow the steps below carefully.
+        </p>
+        <button id="theme-toggle">Dark Mode</button>
+    </header>
+
+    <img src="./img.png" alt="Coursera Automation Preview" class="hero-image">
+
+    <section class="card">
+
+        <h2>Step 0 - Make sure you have python installed on your PC. As installing it is not a part of this tool.</h2>
+            
+        <p> Refer to this video for python installation - <a href="https://www.youtube.com/watch?v=ddGTXBhaGWA&pp=ygUhcHl0aG9uIGluc3RhbGxhdGlvbiBpbiB3aW5kb3dzIDEx">YouTube</a></p>
+
+        <h2>Step 1 — Download the Tool</h2>
+
+        <p>
+            Download the project from
+            <a href="https://github.com/aryansri-coc/courexress" target="_blank">
+                GitHub
+            </a>.
+        </p>
+
+        <p>
+            Make sure Python is already installed on your computer.
+        </p>
+
+    </section>
+
+    <section class="card">
+
+        <h2>Step 2 — Copy Coursera Cookies</h2>
+
+        <p>
+            Login to your Coursera account.
+        </p>
+
+        <ol>
+            <li>Right click anywhere on the page.</li>
+            <li>Click <strong>Inspect</strong>.</li>
+            <li>Open the <strong>Application</strong> tab.</li>
+            <li>Select <strong>Cookies → coursera.org</strong>.</li>
+            <li>Copy these cookie values:
+                <ul>
+                    <li>CAUTH</li>
+                    <li>CSRF3-Token</li>
+                    <li>__204u</li>
+                </ul>
+            </li>
+        </ol>
+
+        <img src="./cookie.jpg" alt="Coursera Cookies Location" class="guide-image">
+
+        <h3>If you are using mac you don't need to save create config.json by own, the command will automatically fetch it from chrome.</h3>
+
+        <label for="csrf">
+            CSRF3-Token
+        </label>
+
+        <input
+            id="csrf"
+            type="text"
+            placeholder="Paste CSRF3-Token">
+
+        <label for="uu">
+            __204u
+        </label>
+
+        <input
+            id="uu"
+            type="text"
+            placeholder="Paste __204u">
+
+        <label for="cauth">
+            CAUTH
+        </label>
+
+        <input
+            id="cauth"
+            type="text"
+            placeholder="Paste CAUTH">
+
+        <div class="button-group">
+            <button id="generate">
+                Generate JSON
+            </button>
+
+            <button id="copy">
+                Copy JSON
+            </button>
+
+            <button id="save">Save config.json</button>
+        </div>
+
+        <pre id="json-output" class="output"></pre>
+
+    </section>
+
+    <section class="card">
+
+        <h2>Step 3 — Create Configuration File</h2>
+
+        <p>
+            Create the following folder if it doesn't already exist:
+        </p>
+
+        <pre class="path">
+C:\Users\YourUsername\.skip-course
+        </pre>
+
+        <p>
+            Inside this folder, create a file named:
+        </p>
+
+        <pre class="path">
+config.json
+        </pre>
+
+        <p>
+            Paste the generated JSON into this file and save it.
+        </p>
+
+    </section>
+
+    <section class="card">
+
+        <h2>Step 4 — Extract Course Slug</h2>
+
+        <p>
+            Paste your Coursera course URL below.
+        </p>
+
+        <label for="course-url">
+            Course URL
+        </label>
+
+        <input
+            id="course-url"
+            type="text"
+            placeholder="https://www.coursera.org/learn/course-name/home">
+
+        <div class="button-group">
+            <button id="extract">
+                Extract Slug
+            </button>
+
+            <button id="copy-slug">
+                Copy Slug
+            </button>
+        </div>
+
+        <pre id="slug-output" class="output"></pre>
+
+    </section>
+
+    <section class="card">
+
+        <h2>Step 5 — Install Requirements</h2>
+
+        <p>
+            Open the downloaded project in VS Code.
+        </p>
+
+        <p>
+            Run:
+        </p>
+
+<pre class="path">
+pip install -r requirements.txt
+</pre>
+
+        <p>
+            Once the installation finishes,
+            press <strong>Ctrl + C</strong> if the terminal
+            continues running. <br>
+
+            In case you get stuck at pyproject.toml process, kill the process by running ctrl + c.
+        </p>
+
+    </section>
+
+    <section class="card">
+
+        <h2>Step 6 — Run the Tool</h2>
+
+        <p>
+            Run:
+        </p>
+
+<pre class="path">
+python -m courexress.main course-slug
+</pre>
+
+        <p>
+            Example:
+            Note: After running if you get module not found error you can download that module by following command - <br><pre class="path">pip install module-name</pre><br>Or<pre class="path">python3 -m pip install module-name</pre>
+        </p>
+
+<pre class="path">
+python -m courexress.main machine-learning
+</pre>
+
+    </section>
+
+    <footer>
+
+        <h2>You're Ready!</h2>
+
+        <p>
+            The entire setup usually takes less than
+            <strong>5 minutes.</strong>
+        </p>
+
+        <p>
+            Welcome to <strong>Courexress</strong>!
+        </p>
+
+    </footer>
+
+</div>
+
+<script src="main.js"></script>
+
+</body>
+</html>
