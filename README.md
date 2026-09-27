@@ -9,12 +9,16 @@
 
 ---
 
-## 👨‍💻 Maintainer
+## 👨‍💻 Maintainers
 
-### **Aryan**
+### **Shiva** (Maintainer)
+- **GitHub**: [Shiva-Altruistic](https://github.com/Shiva-Altruistic)
+- **Repository**: [Courexress](https://github.com/Shiva-Altruistic/courexress)
+
+### **Aryan** (Original Creator)
 - **GitHub**: [aryansri-coc](https://github.com/aryansri-coc)
-- **Repository**: [Courexress](https://github.com/aryansri-coc/courexress)
-- **Language**: Python 3.10+
+- **Upstream Repository**: [Courexress Upstream](https://github.com/aryansri-coc/courexress)
+- **Language**: Python 3.10+ & JavaScript (Chrome Extension V3)
 
 ---
 
@@ -89,7 +93,7 @@ Please help me set up and run Courexress on my system:
 ### 1. Clone or Download the Repository
 
 ```bash
-git clone https://github.com/aryansri-coc/courexress.git
+git clone https://github.com/Shiva-Altruistic/courexress.git
 cd courexress
 ```
 
@@ -249,5 +253,5 @@ This software is developed strictly for **educational and research purposes** re
 ---
 
 <p align="center">
-  Made with ❤️ for <strong>Courexress</strong> • <a href="https://github.com/aryansri-coc/courexress">GitHub Repository</a>
+  Made with ❤️ for <strong>Courexress</strong> • <a href="https://github.com/Shiva-Altruistic/courexress">GitHub Repository</a>
 </p>
