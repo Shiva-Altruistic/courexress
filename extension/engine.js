@@ -28,18 +28,23 @@ const MANUAL_SKIP_TYPES = new Set(['phasedPeer']);
  * Direct Gemini API caller with automatic model failover
  */
 async function callGemini(apiKey, prompt, schema = null) {
-  if (!apiKey) throw new Error('No Gemini API Key provided.');
-  const models = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash'];
+  const cleanKey = apiKey ? apiKey.trim().replace(/^["']|["']$/g, '') : '';
+  if (!cleanKey) throw new Error('No Gemini API Key provided. Paste your free key in AI & Settings.');
+
+  // Current production Google Gemini models
+  const models = ['gemini-flash-lite-latest', 'gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.8-flash'];
+  let lastError = null;
+
   for (const model of models) {
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(cleanKey)}`;
       const body = {
         contents: [{ parts: [{ text: prompt }] }]
       };
       if (schema) {
         body.generationConfig = {
-          response_mime_type: 'application/json',
-          response_schema: schema
+          responseMimeType: 'application/json',
+          responseSchema: schema
         };
       }
       const res = await fetch(url, {
@@ -47,15 +52,40 @@ async function callGemini(apiKey, prompt, schema = null) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
+
       if (res.status === 429 || res.status === 503) {
-        continue; // Try next model immediately
+        lastError = new Error(`Gemini quota limit or busy on ${model} (HTTP ${res.status})`);
+        continue; // Try next fallback model
       }
+
       if (!res.ok) {
+        let errDetail = `HTTP ${res.status}`;
+        try {
+          const errJson = await res.json();
+          if (errJson?.error?.message) {
+            errDetail = errJson.error.message;
+          }
+        } catch (_) {
+          const errText = await res.text();
+          if (errText) errDetail = errText.slice(0, 120);
+        }
+
+        // If credentials / authentication failed, fail fast with clear instructions!
+        if (res.status === 400 || res.status === 401 || res.status === 403) {
+          throw new Error(`Gemini API Authentication Failed (${res.status}): ${errDetail}. Verify key starts with "AIzaSy" from Google AI Studio.`);
+        }
+
+        lastError = new Error(`Gemini ${model} failed (${res.status}): ${errDetail}`);
         continue;
       }
+
       const data = await res.json();
       const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!rawText) continue;
+      if (!rawText) {
+        lastError = new Error(`Gemini ${model} returned empty content.`);
+        continue;
+      }
+
       if (schema) {
         try {
           return JSON.parse(rawText);
@@ -66,11 +96,17 @@ async function callGemini(apiKey, prompt, schema = null) {
       }
       return rawText;
     } catch (e) {
+      if (e.message && e.message.includes('Authentication Failed')) {
+        throw e;
+      }
+      lastError = e;
       console.warn(`Model ${model} query attempt failed:`, e);
     }
   }
-  throw new Error('All Gemini API model requests failed or quota exceeded.');
+
+  throw lastError || new Error('All Gemini API model requests failed or quota exceeded.');
 }
+
 
 export class CourexressEngine {
   constructor(options = {}) {
@@ -684,36 +720,64 @@ export class CourexressEngine {
       return false;
     }
 
-    const targetGrade = 0.8;
-    const maxAttempts = 5;
+    const TARGET_GRADE = 0.8; // 80% passing threshold
+    const MAX_SUBMISSIONS = 5;
+    let submissionsCount = 0;
 
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    // Memory to track question feedback across attempts for this quiz
+    // partId -> { knownCorrect: string[], knownIncorrect: Set<string> }
+    const questionMemory = new Map();
+
+    while (submissionsCount < MAX_SUBMISSIONS) {
       const state = await this._getQuizState(item.id);
       if (!state) return false;
 
-      if (state.outcome?.isPassed && (state.outcome.earnedGrade || 0) >= targetGrade) {
-        this.onLog(`Quiz already passed (${((state.outcome.earnedGrade || 0) * 100).toFixed(0)}%)!`, 'done');
+      const currentGrade = state.outcome?.earnedGrade || 0;
+      if (state.outcome?.isPassed && currentGrade >= TARGET_GRADE) {
+        this.onLog(`Quiz ${item.name}: Passed with target grade (${(currentGrade * 100).toFixed(0)}% >= 80%)! 🎉`, 'done');
         return true;
       }
 
-      const allowed = state.allowedAction;
-      if (allowed === 'START_NEW_ATTEMPT') {
-        const started = await this._startQuizAttempt(item.id);
-        if (!started) return false;
-        await new Promise(r => setTimeout(r, 1000));
-        continue;
-      } else if (allowed === 'RESUME_DRAFT') {
-        // Draft ready
-      } else if (!allowed) {
+      let allowed = state.allowedAction;
+
+      // If no action is currently permitted
+      if (!allowed) {
         const increaseAt = state.attempts?.rateLimiterConfig?.attemptsRemainingIncreasesAt;
+        let cooldownMsg = '';
         if (increaseAt) {
-          this.onLog(`Cooldown active until ${new Date(increaseAt).toLocaleTimeString()}`, 'warning');
+          cooldownMsg = ` (Cooldown until ${new Date(increaseAt).toLocaleTimeString()})`;
         }
+        if (state.outcome?.isPassed) {
+          this.onLog(`Quiz ${item.name}: Passed at ${(currentGrade * 100).toFixed(0)}% (below 80% target), but no more attempts available now${cooldownMsg}.`, 'warning');
+          return true;
+        }
+        this.onLog(`Quiz ${item.name}: No attempts available${cooldownMsg}.`, 'warning');
         return false;
       }
 
+      // If we need to initiate a new attempt
+      if (allowed === 'START_NEW_ATTEMPT') {
+        this.onLog(`Starting new attempt for ${item.name}...`, 'info');
+        const started = await this._startQuizAttempt(item.id);
+        if (!started) {
+          this.onLog(`Could not start new quiz attempt for ${item.name}`, 'fail');
+          return false;
+        }
+        await new Promise(r => setTimeout(r, 1500));
+        // Refresh state to obtain the in-progress draft
+        const refreshedState = await this._getQuizState(item.id);
+        if (!refreshedState || refreshedState.allowedAction !== 'RESUME_DRAFT') {
+          await new Promise(r => setTimeout(r, 1500));
+        }
+        continue;
+      }
+
+      // At this point allowed === 'RESUME_DRAFT'
       const inProgress = state.attempts?.inProgressAttempt;
-      if (!inProgress) return false;
+      if (!inProgress) {
+        this.onLog(`No in-progress draft found for ${item.name}`, 'fail');
+        return false;
+      }
 
       const attemptId = inProgress.id;
       const draftId = inProgress.draft?.id;
@@ -724,6 +788,9 @@ export class CourexressEngine {
       for (const part of parts) {
         const type = part.__typename;
         const partId = part.partId;
+        const qMem = questionMemory.get(partId) || { knownCorrect: null, knownIncorrect: new Set() };
+        questionMemory.set(partId, qMem);
+
         if (type === 'Submission_MultipleChoiceQuestion' || type === 'Submission_MultipleChoiceReflectQuestion') {
           const opts = (part.questionSchema?.options || []).map(o => ({
             option_id: o.optionId,
@@ -732,7 +799,8 @@ export class CourexressEngine {
           unsolvedQuestions[partId] = {
             Question: part.questionSchema?.prompt?.cmlValue || '',
             Options: opts,
-            Type: 'MULTIPLE_CHOICE'
+            Type: 'MULTIPLE_CHOICE',
+            KnownIncorrect: Array.from(qMem.knownIncorrect)
           };
         } else if (type === 'Submission_CheckboxQuestion' || type === 'Submission_CheckboxReflectQuestion') {
           const opts = (part.questionSchema?.options || []).map(o => ({
@@ -742,7 +810,8 @@ export class CourexressEngine {
           unsolvedQuestions[partId] = {
             Question: part.questionSchema?.prompt?.cmlValue || '',
             Options: opts,
-            Type: 'CHECKBOX'
+            Type: 'CHECKBOX',
+            KnownIncorrect: Array.from(qMem.knownIncorrect)
           };
         } else if (type === 'Submission_TextReflectQuestion') {
           unsolvedQuestions[partId] = {
@@ -776,7 +845,7 @@ export class CourexressEngine {
             },
             required: ['responses']
           };
-          const prompt = `Solve this Coursera quiz with high accuracy:\n${JSON.stringify(unsolvedQuestions, null, 2)}\n\nFollow exact schema. For MULTIPLE_CHOICE pick 1 option_id. For CHECKBOX pick 1 or more option_ids.`;
+          const prompt = `Solve this Coursera quiz with high academic precision to score 100%:\n${JSON.stringify(unsolvedQuestions, null, 2)}\n\nIMPORTANT RULES:\n- For MULTIPLE_CHOICE: Pick exactly 1 option_id. If 'KnownIncorrect' option_ids are listed, DO NOT select them!\n- For CHECKBOX: Pick 1 or more correct option_ids.\n- Follow the JSON schema strictly.`;
           const res = await callGemini(this.geminiApiKey, prompt, schema);
           aiResponses = res?.responses || [];
         } catch (e) {
@@ -785,31 +854,51 @@ export class CourexressEngine {
       }
 
       const responsesToSave = [];
+      const submittedOptionMap = new Map(); // partId -> string[] of chosen option_ids
+
       for (const [qid, qInfo] of Object.entries(unsolvedQuestions)) {
         const qType = qInfo.Type;
         const opts = qInfo.Options || [];
         const validOptIds = new Set(opts.map(o => o.option_id));
+        const qMem = questionMemory.get(qid);
 
-        const aiAns = aiResponses.find(r => r.question_id === qid);
         let chosenIds = [];
 
-        if (aiAns && aiAns.chosen && aiAns.chosen.length > 0) {
-          for (const c of aiAns.chosen) {
-            if (validOptIds.has(c)) {
-              chosenIds.push(c);
-            } else {
-              const clean = String(c).trim().toLowerCase();
-              const matched = opts.find(o => o.value.toLowerCase().includes(clean) || (clean === 'true' && o.value.toLowerCase().includes('true')) || (clean === 'false' && o.value.toLowerCase().includes('false')));
-              if (matched && !chosenIds.includes(matched.option_id)) {
-                chosenIds.push(matched.option_id);
+        // If we already know the correct option from a previous attempt's feedback, reuse it
+        if (qMem && qMem.knownCorrect && qMem.knownCorrect.length > 0) {
+          chosenIds = qMem.knownCorrect.filter(c => validOptIds.has(c));
+        }
+
+        if (chosenIds.length === 0) {
+          const aiAns = aiResponses.find(r => r.question_id === qid);
+          if (aiAns && aiAns.chosen && aiAns.chosen.length > 0) {
+            for (const c of aiAns.chosen) {
+              if (validOptIds.has(c)) {
+                // If known incorrect, skip if alternative choices exist
+                if (qMem && qMem.knownIncorrect.has(c) && opts.length > qMem.knownIncorrect.size) {
+                  continue;
+                }
+                chosenIds.push(c);
+              } else {
+                const clean = String(c).trim().toLowerCase();
+                const matched = opts.find(o => o.value.toLowerCase().includes(clean) || (clean === 'true' && o.value.toLowerCase().includes('true')) || (clean === 'false' && o.value.toLowerCase().includes('false')));
+                if (matched && !chosenIds.includes(matched.option_id)) {
+                  if (!(qMem && qMem.knownIncorrect.has(matched.option_id) && opts.length > qMem.knownIncorrect.size)) {
+                    chosenIds.push(matched.option_id);
+                  }
+                }
               }
             }
           }
         }
 
+        // Fallback: pick the first option not known to be incorrect
         if (chosenIds.length === 0 && opts.length > 0) {
-          chosenIds = [opts[0].option_id];
+          const available = opts.filter(o => !qMem?.knownIncorrect?.has(o.option_id));
+          chosenIds = available.length > 0 ? [available[0].option_id] : [opts[0].option_id];
         }
+
+        submittedOptionMap.set(qid, chosenIds);
 
         let respObj = {};
         if (qType === 'MULTIPLE_CHOICE') {
@@ -829,6 +918,7 @@ export class CourexressEngine {
             }
           };
         } else if (qType === 'TEXT_REFLECT') {
+          const aiAns = aiResponses.find(r => r.question_id === qid);
           respObj = {
             questionId: qid,
             questionType: 'TEXT_REFLECT',
@@ -852,18 +942,47 @@ export class CourexressEngine {
         return false;
       }
 
+      submissionsCount++;
+      this.onLog(`Submitted attempt ${submissionsCount} for ${item.name}. Evaluating score...`, 'info');
+
       await new Promise(r => setTimeout(r, 4000));
       const feedback = await this._getQuizFeedback(item.id);
       const score = feedback?.outcome?.latestScore || 0;
       const max = feedback?.outcome?.maxScore || 1;
       const grade = max ? score / max : 0;
+      const gradePercent = ((grade) * 100).toFixed(0);
 
-      this.onLog(`Quiz ${item.name}: Grade ${((grade) * 100).toFixed(0)}%`, grade >= targetGrade ? 'done' : 'warning');
-      if (grade >= targetGrade) {
+      // Parse question feedback to update memory
+      if (feedback?.parts && Array.isArray(feedback.parts)) {
+        for (const fPart of feedback.parts) {
+          const fbPartId = fPart.partId;
+          const correctness = fPart.feedback?.correctness;
+          for (const [qid, qMem] of questionMemory.entries()) {
+            if (qid === fbPartId || qid.endsWith(`~${fbPartId}`) || fbPartId.endsWith(`~${qid}`)) {
+              const submittedChoices = submittedOptionMap.get(qid) || [];
+              if (correctness === 'CORRECT') {
+                qMem.knownCorrect = submittedChoices;
+              } else if (correctness === 'INCORRECT') {
+                submittedChoices.forEach(c => qMem.knownIncorrect.add(c));
+              }
+            }
+          }
+        }
+      }
+
+      if (grade >= TARGET_GRADE) {
+        this.onLog(`Quiz ${item.name}: Grade ${gradePercent}% (>= 80% passing target)! 🎉`, 'done');
         return true;
       }
 
-      await new Promise(r => setTimeout(r, 2000));
+      // Less than 80% - reperform again if submissions remaining
+      if (submissionsCount < MAX_SUBMISSIONS) {
+        this.onLog(`Quiz ${item.name}: Grade ${gradePercent}% is less than 80% target. Reperforming attempt ${submissionsCount + 1}...`, 'warning');
+        await new Promise(r => setTimeout(r, 2500));
+      } else {
+        this.onLog(`Quiz ${item.name}: Final grade ${gradePercent}%. Max attempts reached.`, grade >= 0.7 ? 'warning' : 'fail');
+        return grade >= 0.7; // Return true if at least passing according to Coursera
+      }
     }
     return false;
   }

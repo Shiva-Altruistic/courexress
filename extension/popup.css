@@ -1454,3 +1454,68 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .strip-link:hover {
   color: #00F2FE;
 }
+
+/* Key Test Bar & Validation Badges */
+.key-test-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-test-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(0, 242, 254, 0.2));
+  border: 1px solid rgba(0, 242, 254, 0.4);
+  color: #00F2FE;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s var(--smooth);
+}
+
+.btn-test-key:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(0, 242, 254, 0.35));
+  border-color: #00F2FE;
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-test-key:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.key-notice {
+  font-size: 11px;
+  line-height: 1.35;
+  flex: 1;
+  word-break: break-word;
+}
+
+.key-notice.success {
+  color: #34D399;
+  font-weight: 600;
+}
+
+.key-notice.error {
+  color: #FB7185;
+  font-weight: 600;
+}
+
+.key-notice.warning {
+  color: #FBBF24;
+  font-weight: 600;
+}
+
+.key-notice.loading {
+  color: #93C5FD;
+}
+

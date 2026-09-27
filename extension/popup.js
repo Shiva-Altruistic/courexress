@@ -97,8 +97,9 @@ async function loadSavedSettings() {
 }
 
 function saveSettings() {
+  const cleanKey = (geminiApiKeyInput.value || '').trim().replace(/^["']|["']$/g, '');
   chrome.storage.local.set({
-    geminiApiKey: geminiApiKeyInput.value.trim(),
+    geminiApiKey: cleanKey,
     workers: parseInt(workersSlider.value, 10),
     delay: parseInt(delaySlider.value, 10),
     includeQuizzes: toggleQuizzes.checked,
@@ -301,8 +302,77 @@ function setupEventListeners() {
     }
   });
 
+  const cleanApiKey = () => geminiApiKeyInput.value.trim().replace(/^["']|["']$/g, '');
+
+  const btnTestKey = document.getElementById('btnTestKey');
+  const keyNotice = document.getElementById('keyNotice');
+
+  function checkKeyFormat() {
+    // Both standard AIzaSy and new Google AI Studio AQ. keys are supported
+    if (!keyNotice) return;
+    keyNotice.className = 'key-notice';
+    keyNotice.textContent = '';
+  }
+
+  geminiApiKeyInput.addEventListener('input', () => {
+    checkKeyFormat();
+    saveSettings();
+  });
   geminiApiKeyInput.addEventListener('change', saveSettings);
   geminiApiKeyInput.addEventListener('blur', saveSettings);
+
+  if (btnTestKey) {
+    btnTestKey.addEventListener('click', async () => {
+      const key = cleanApiKey();
+      if (!key) {
+        keyNotice.className = 'key-notice error';
+        keyNotice.textContent = 'Please enter an API key first.';
+        return;
+      }
+
+      btnTestKey.disabled = true;
+      keyNotice.className = 'key-notice loading';
+      keyNotice.textContent = 'Testing connection to Gemini...';
+
+      const testModels = ['gemini-flash-lite-latest', 'gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3.5-flash'];
+      let succeeded = false;
+      let lastErrText = '';
+
+      for (const model of testModels) {
+        try {
+          const testUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
+          const res = await fetch(testUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: 'Ping' }] }] })
+          });
+
+          if (res.ok) {
+            keyNotice.className = 'key-notice success';
+            keyNotice.textContent = `✅ Connected successfully! (${model} verified)`;
+            saveSettings();
+            succeeded = true;
+            break;
+          } else {
+            lastErrText = `HTTP ${res.status}`;
+            try {
+              const errData = await res.json();
+              if (errData?.error?.message) lastErrText = errData.error.message;
+            } catch (_) {}
+          }
+        } catch (err) {
+          lastErrText = err.message;
+        }
+      }
+
+      if (!succeeded) {
+        keyNotice.className = 'key-notice error';
+        keyNotice.textContent = `❌ ${lastErrText}`;
+      }
+
+      btnTestKey.disabled = false;
+    });
+  }
 
   workersSlider.addEventListener('input', () => {
     workersVal.textContent = `${workersSlider.value} workers`;
@@ -351,7 +421,7 @@ function setupEventListeners() {
         includeWidgets: toggleWidgets.checked,
         includeQuizzes: toggleQuizzes.checked,
         includeDiscussions: toggleDiscussions.checked,
-        geminiApiKey: geminiApiKeyInput.value.trim()
+        geminiApiKey: (geminiApiKeyInput.value || '').trim().replace(/^["']|["']$/g, '')
       }
     }, (res) => {
       if (res && res.error) {

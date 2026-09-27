@@ -27,14 +27,15 @@ DEFAULT_RESPONSE_SCHEMA = {
     "required": ["responses"]
 }
 
-FALLBACK_MODELS = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"]
+FALLBACK_MODELS = ["gemini-flash-lite-latest", "gemini-3.6-flash", "gemini-3.7-flash", "gemini-3.5-flash", "gemini-flash-latest", "gemini-3.8-flash"]
 
 
 class GeminiConnector:
     """Connects to Google Gemini API with automatic model failover and retries."""
 
     def __init__(self, api_key: str = None, model: str = None):
-        self.api_key = api_key or getattr(config, "GEMINI_API_KEY", "")
+        raw_key = api_key or getattr(config, "GEMINI_API_KEY", "") or ""
+        self.api_key = raw_key.strip().strip('"\'')
         self.models = [model] if model else FALLBACK_MODELS
         if not self.api_key:
             raise RuntimeError("Gemini API Key is not configured. Add 'gemini_api_key' to ~/.skip-course/config.json")
@@ -90,6 +91,15 @@ class GeminiConnector:
                                     return json.loads(clean.strip())
 
                             return text.strip()
+
+                        if res.status_code in [400, 401, 403]:
+                            err_msg = (
+                                f"Gemini API Authentication Failed ({res.status_code}): {res.text}. "
+                                "Make sure you are using a Google AI Studio API key starting with 'AIzaSy...' "
+                                "(not an OAuth token or GCP access token)."
+                            )
+                            logger.error(err_msg)
+                            raise RuntimeError(err_msg)
 
                         if res.status_code in [429, 503]:
                             logger.info(f"Model {model} busy ({res.status_code}), switching to fallback model immediately...")
