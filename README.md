@@ -27,9 +27,41 @@
 **Courexress** communicates directly with Coursera using your authenticated session cookies. Instead of manually clicking through hundreds of lectures, readings, and widgets, this tool processes them in minutes in the background.
 
 - ⚡ **Fast & Efficient**: Emulates completion pings directly via Coursera APIs.
-- 🎯 **Safe Processing**: Skips graded quizzes and peer reviews so you can complete graded assessments manually.
+- 🎯 **AI Quiz & Assessment Solver**: Solves quizzes and tests with Gemini AI and auto-reperforms if grade is $< 80\%$ until passed.
+- 🧩 **Zero Python Setup**: Complete courses directly from your browser using the included Chrome Extension.
 - 🌐 **Includes Offline Web Helper**: Open `web/index.html` in your browser to easily generate your configuration file and extract course slugs.
 - 💻 **Cross-Platform**: Works on Windows, macOS, and Linux.
+
+---
+
+## ⚡ How to Install Extension in Chrome from ZIP File (30 Seconds)
+
+You can run **Courexress** directly inside your browser with **zero Python installation or terminal setup**:
+
+### Step 1: Download the ZIP
+* Click and download [`courexress-extension.zip`](https://github.com/Shiva-Altruistic/courexress/raw/main/courexress-extension.zip) from this repository.
+
+### Step 2: Extract the ZIP
+* Right-click `courexress-extension.zip` on your computer and select **Extract All...** (or unzip it to any folder).
+
+### Step 3: Open Chrome Extensions
+* Open Google Chrome (or Edge / Brave) and navigate to:
+  ```text
+  chrome://extensions/
+  ```
+
+### Step 4: Enable Developer Mode
+* Toggle **ON** the **Developer mode** switch located in the **top-right corner**.
+
+### Step 5: Load the Extension
+* Click the **Load unpacked** button in the **top-left corner**.
+* Select the extracted folder (the folder containing `manifest.json`, `popup.html`, etc.).
+
+### Step 6: Start Automating!
+* Pin the **Courexress** extension to your browser toolbar.
+* Open your Coursera course page.
+* (Optional) In the extension's **AI & Configuration** tab, add your free Google Gemini API key to automatically solve and pass quizzes ($\ge 80\%$) and discussion prompts.
+* Click **Start Automation**!
 
 ---
 
