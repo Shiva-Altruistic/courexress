@@ -29,7 +29,7 @@ const MANUAL_SKIP_TYPES = new Set(['phasedPeer']);
  */
 async function callGemini(apiKey, prompt, schema = null) {
   const cleanKey = apiKey ? apiKey.trim().replace(/^["']|["']$/g, '') : '';
-  if (!cleanKey) throw new Error('No Gemini API Key provided. Paste your free key in AI & Settings.');
+  if (!cleanKey) throw new Error('Google AI Studio API key is required to complete questions and answers. Get your free key at https://aistudio.google.com/app/apikey and paste it in AI & Settings.');
 
   // Current production Google Gemini models
   const models = ['gemini-flash-lite-latest', 'gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.8-flash'];
@@ -715,7 +715,7 @@ export class CourexressEngine {
 
   async _handleQuiz(item) {
     if (!this.geminiApiKey) {
-      this.onLog(`[!] Quiz skipped (${item.name}): Gemini API key required. Paste your free key in Settings.`, 'skip');
+      this.onLog(`[!] Quiz skipped (${item.name}): To complete questions and answers, a Google AI Studio API key is required. Get your free key at https://aistudio.google.com/app/apikey and add it in AI & Settings.`, 'skip');
       this.skippedItems.add(item.id);
       return false;
     }

@@ -74,13 +74,13 @@ C:\Users\Public\courseraxtress\courexress-main\courexress-extension.zip
 
 ## ⚙️ Configuration & Options
 
-Click the extension icon in your browser toolbar and expand **Automation Settings**:
-- **Gemini AI API Key**: Enter your own free Google Gemini API key (from [Google AI Studio](https://aistudio.google.com/app/apikey)) to enable automated solving of Quizzes, Practice Tests, and Discussions.
+Click the extension icon in your browser toolbar and check **AI & Settings**:
+- 🔑 **Google AI Studio API Key (Required for Questions & Answers)**: If you want to automatically complete questions and answers (Quizzes, Practice Tests, and Discussion reflections), you must provide a free Google AI Studio API key from [Google AI Studio (https://aistudio.google.com/app/apikey)](https://aistudio.google.com/app/apikey). Without this key, questions and quizzes are skipped to prevent incorrect answers.
 - **Parallel Workers**: Select 1 to 8 workers for concurrent processing (default: 5).
 - **Throttle Delay**: Throttle slider (0 to 1000ms) to ensure gentle API pacing.
-- **Solve Quizzes & Practice Tests (AI)**: Automatically solves and submits graded quizzes and practice assessments ($\ge 80\%$ score).
-- **Answer Discussions (AI)**: Automatically writes and posts context-relevant learner responses to reflection prompts.
-- **Solve Coach Items & Widgets**: Complete AI coach items and interactive widget checkpoints.
+- **Auto-Solve Quizzes & Tests**: Automatically solves and submits graded questions and tests ($\ge 80\%$ pass score) using your Google AI Studio API key.
+- **Auto-Answer Discussions**: Automatically writes and posts context-relevant learner responses to reflection questions using your Google AI Studio API key.
+- **Solve Coach Items & Widgets**: Complete AI coach checkpoints and interactive widget items.
 
 ---
 

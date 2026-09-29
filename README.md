@@ -60,7 +60,7 @@ You can run **Courexress** directly inside your browser with **zero Python insta
 ### Step 6: Start Automating!
 * Pin the **Courexress** extension to your browser toolbar.
 * Open your Coursera course page.
-* (Optional) In the extension's **AI & Configuration** tab, add your free Google Gemini API key to automatically solve and pass quizzes ($\ge 80\%$) and discussion prompts.
+* **To Complete Questions & Answers**: If you want the extension to automatically complete questions and answers (quizzes, practice tests, and discussion reflections), you need to provide your free Google AI Studio API key (get it at [Google AI Studio: https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)) in the **AI & Settings** tab.
 * Click **Start Automation**!
 
 ---

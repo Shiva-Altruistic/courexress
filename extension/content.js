@@ -48,6 +48,10 @@
         <button class="cx-btn cx-btn-start" id="cxStartBtn">Start</button>
         <button class="cx-btn cx-btn-stop" id="cxStopBtn" style="display: none;">Stop</button>
       </div>
+
+      <div class="cx-key-notice">
+        💡 <strong>Questions & Answers:</strong> Requires a Google AI Studio API key (<a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Get Free Key</a>).
+      </div>
     </div>
   `;
 

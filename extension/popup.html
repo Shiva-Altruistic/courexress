@@ -84,6 +84,26 @@
           </div>
         </div>
 
+        <!-- Questions & Answers API Key Notice Banner -->
+        <div class="glass-card qa-key-banner" id="qaBanner">
+          <div class="qa-banner-content">
+            <div class="qa-banner-icon">💡</div>
+            <div class="qa-banner-text">
+              <span class="qa-banner-title">Complete Questions & Answers</span>
+              <span class="qa-banner-sub">To auto-solve quizzes and discussion questions, a <strong>Google AI Studio API key</strong> is required.</span>
+            </div>
+          </div>
+          <div class="qa-banner-actions">
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="qa-banner-btn-link" title="Get free API key on Google AI Studio">
+              <span>Get Free Key</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+            <button type="button" id="btnGoToSettings" class="qa-banner-btn-config" title="Open AI & Settings tab">
+              Enter Key
+            </button>
+          </div>
+        </div>
+
         <!-- Hero Stats Dashboard -->
         <div class="glass-card hero-dashboard">
           <div class="ring-and-metric">
@@ -193,13 +213,31 @@
 
           <p class="section-desc">Empowers automated problem solving for multiple-choice tests, multi-select questions, and discussion reflection prompts.</p>
 
+          <div class="qa-requirement-card">
+            <div class="qa-req-badge">
+              <span class="pulse-dot-amber"></span>
+              <span>REQUIRED FOR QUESTIONS & ANSWERS</span>
+            </div>
+            <p class="qa-req-info">
+              If you want to complete questions and answers (quizzes, practice tests, and discussions), you must provide your <strong>Google AI Studio API key</strong>.
+            </p>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="qa-studio-link-btn" title="Open Google AI Studio to get a free API key">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+              <span>Get Free Key: https://aistudio.google.com/app/apikey</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+          </div>
+
           <div class="api-key-input-block">
-            <label for="geminiApiKey">Your Google Gemini API Key</label>
+            <label for="geminiApiKey">Your Google AI Studio API Key</label>
             <div class="input-wrapper key-wrapper">
               <input type="password" id="geminiApiKey" placeholder="AIzaSy... (from Google AI Studio)" spellcheck="false" autocomplete="off" />
               <button id="btnToggleApiKey" class="action-mini-btn" title="Toggle key visibility">
                 <svg id="eyeIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
               </button>
+            </div>
+            <div class="key-help-line">
+              <span>🔑 Need a key? Get one free at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio (https://aistudio.google.com/app/apikey) ↗</a></span>
             </div>
             <div class="key-test-bar">
               <button id="btnTestKey" type="button" class="btn-test-key" title="Verify key connectivity with Gemini">
@@ -230,7 +268,7 @@
                 <span class="switch-icon-chip chip-violet">📝</span>
                 <span class="switch-title">Auto-Solve Quizzes & Tests</span>
               </div>
-              <span class="switch-desc">AI computes correct choices & submits for 80%+ passing score</span>
+              <span class="switch-desc">AI computes questions & answers for 80%+ passing score. <strong class="req-tag">Requires <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio Key</a></strong></span>
             </div>
             <label class="ios-switch">
               <input type="checkbox" id="toggleQuizzes" checked />
@@ -244,7 +282,7 @@
                 <span class="switch-icon-chip chip-cyan">💬</span>
                 <span class="switch-title">Auto-Answer Discussions</span>
               </div>
-              <span class="switch-desc">Composes thoughtful, human-grade learner reflection answers</span>
+              <span class="switch-desc">Composes thoughtful, human-grade learner reflection answers. <strong class="req-tag">Requires <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio Key</a></strong></span>
             </div>
             <label class="ios-switch">
               <input type="checkbox" id="toggleDiscussions" checked />
@@ -317,7 +355,7 @@
           <div class="trust-card">
             <div class="trust-icon">💻</div>
             <h4>Local-First Storage</h4>
-            <p>Your API key and settings live strictly inside <code>chrome.storage.local</code> on your device.</p>
+            <p>Your Google AI Studio API key and settings live strictly inside <code>chrome.storage.local</code> on your device.</p>
           </div>
 
           <div class="trust-card">

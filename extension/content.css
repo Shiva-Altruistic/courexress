@@ -223,3 +223,24 @@
 .cx-btn-stop:hover {
   background: rgba(244, 63, 94, 0.32);
 }
+
+.cx-key-notice {
+  font-size: 10px;
+  color: #CBD5E1;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 6px 9px;
+  border-radius: 8px;
+  line-height: 1.35;
+  margin-top: 2px;
+}
+
+.cx-key-notice strong {
+  color: #FCD34D;
+}
+
+.cx-key-notice a {
+  color: #00F2FE;
+  text-decoration: underline;
+  font-weight: 700;
+}

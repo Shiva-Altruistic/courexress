@@ -13,6 +13,8 @@ const autoDetectBadge = document.getElementById('autoDetectBadge');
 const btnPaste = document.getElementById('btnPaste');
 const authStatus = document.getElementById('authStatus');
 const authUserText = document.getElementById('authUserText');
+const qaBanner = document.getElementById('qaBanner');
+const btnGoToSettings = document.getElementById('btnGoToSettings');
 
 // Progress & Metrics
 const percentText = document.getElementById('percentText');
@@ -74,11 +76,47 @@ function setupTabs() {
   });
 }
 
+function switchToTab(targetId) {
+  segmentButtons.forEach((b) => {
+    if (b.getAttribute('data-tab') === targetId) {
+      b.classList.add('active');
+    } else {
+      b.classList.remove('active');
+    }
+  });
+  tabPanes.forEach((p) => {
+    if (p.id === targetId) {
+      p.classList.add('active');
+    } else {
+      p.classList.remove('active');
+    }
+  });
+}
+
+function updateQaBannerStatus(key) {
+  if (!qaBanner) return;
+  const hasKey = Boolean(key && key.trim());
+  const titleEl = qaBanner.querySelector('.qa-banner-title');
+  const subEl = qaBanner.querySelector('.qa-banner-sub');
+  if (hasKey) {
+    qaBanner.classList.add('configured');
+    if (titleEl) titleEl.textContent = 'Questions & Answers AI Active';
+    if (subEl) subEl.innerHTML = 'Quizzes and questions enabled via <strong>Google AI Studio</strong>.';
+    if (btnGoToSettings) btnGoToSettings.textContent = 'Manage Key';
+  } else {
+    qaBanner.classList.remove('configured');
+    if (titleEl) titleEl.textContent = 'Complete Questions & Answers';
+    if (subEl) subEl.innerHTML = 'To auto-solve quizzes and discussion questions, a <strong>Google AI Studio API key</strong> is required.';
+    if (btnGoToSettings) btnGoToSettings.textContent = 'Enter Key';
+  }
+}
+
 async function loadSavedSettings() {
   chrome.storage.local.get(
     ['geminiApiKey', 'workers', 'delay', 'includeQuizzes', 'includeDiscussions', 'includeCoach', 'includeWidgets'],
     (res) => {
       geminiApiKeyInput.value = res.geminiApiKey || '';
+      updateQaBannerStatus(res.geminiApiKey);
 
       if (res.workers) {
         workersSlider.value = res.workers;
@@ -98,6 +136,7 @@ async function loadSavedSettings() {
 
 function saveSettings() {
   const cleanKey = (geminiApiKeyInput.value || '').trim().replace(/^["']|["']$/g, '');
+  updateQaBannerStatus(cleanKey);
   chrome.storage.local.set({
     geminiApiKey: cleanKey,
     workers: parseInt(workersSlider.value, 10),
@@ -326,7 +365,7 @@ function setupEventListeners() {
       const key = cleanApiKey();
       if (!key) {
         keyNotice.className = 'key-notice error';
-        keyNotice.textContent = 'Please enter an API key first.';
+        keyNotice.textContent = 'Please enter a Google AI Studio API key first (get a free key at https://aistudio.google.com/app/apikey).';
         return;
       }
 
@@ -384,6 +423,15 @@ function setupEventListeners() {
     saveSettings();
   });
 
+  if (btnGoToSettings) {
+    btnGoToSettings.addEventListener('click', () => {
+      switchToTab('tab-settings');
+      if (geminiApiKeyInput) {
+        geminiApiKeyInput.focus();
+      }
+    });
+  }
+
   toggleQuizzes.addEventListener('change', saveSettings);
   toggleDiscussions.addEventListener('change', saveSettings);
   toggleCoach.addEventListener('change', saveSettings);
@@ -401,11 +449,11 @@ function setupEventListeners() {
 
     saveSettings();
 
-    // Friendly notice if user checked AI Quizzes but forgot API key
+    // Friendly notice if user checked AI Quizzes or Discussions but forgot API key
     if ((toggleQuizzes.checked || toggleDiscussions.checked) && !geminiApiKeyInput.value.trim()) {
       appendLogEntry({
         type: 'warning',
-        text: 'Notice: No Gemini key provided. Quizzes will be skipped. To solve quizzes, add your free key in AI & Settings.',
+        text: '⚠️ Notice: If you want to complete questions and answers, a Google AI Studio API key is required! Get your free key at https://aistudio.google.com/app/apikey and paste it in AI & Settings. Quizzes will be skipped without an API key.',
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       });
     }

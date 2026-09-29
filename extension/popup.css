@@ -1519,3 +1519,206 @@ input[type="range"]::-webkit-slider-thumb:hover {
   color: #93C5FD;
 }
 
+/* Questions & Answers Requirement Banner & Card Styles */
+.qa-key-banner {
+  background: linear-gradient(135deg, rgba(30, 27, 75, 0.75), rgba(49, 16, 74, 0.75));
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35), 0 0 12px rgba(168, 85, 247, 0.15);
+  transition: all 0.25s ease;
+  margin-bottom: 2px;
+}
+
+.qa-key-banner.configured {
+  background: linear-gradient(135deg, rgba(6, 78, 59, 0.4), rgba(15, 23, 42, 0.8));
+  border-color: rgba(52, 211, 153, 0.4);
+}
+
+.qa-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex: 1;
+}
+
+.qa-banner-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.5));
+}
+
+.qa-banner-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.qa-banner-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: #F8FAFC;
+  letter-spacing: -0.01em;
+}
+
+.qa-banner-sub {
+  font-size: 10px;
+  color: #CBD5E1;
+  line-height: 1.35;
+}
+
+.qa-banner-sub strong {
+  color: #FBBF24;
+}
+
+.qa-key-banner.configured .qa-banner-sub strong {
+  color: #34D399;
+}
+
+.qa-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.qa-banner-btn-link {
+  font-size: 10px;
+  font-weight: 800;
+  color: #00F2FE;
+  background: rgba(0, 242, 254, 0.15);
+  border: 1px solid rgba(0, 242, 254, 0.45);
+  padding: 4px 8px;
+  border-radius: 6px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.qa-banner-btn-link:hover {
+  background: rgba(0, 242, 254, 0.28);
+  border-color: #00F2FE;
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.35);
+  transform: translateY(-1px);
+}
+
+.qa-banner-btn-config {
+  font-size: 10px;
+  font-weight: 700;
+  color: #E2E8F0;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.qa-banner-btn-config:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #FFFFFF;
+}
+
+/* Tab 2 Requirement Card */
+.qa-requirement-card {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(236, 72, 153, 0.1));
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.qa-req-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #FBBF24;
+  text-transform: uppercase;
+}
+
+.pulse-dot-amber {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #F59E0B;
+  box-shadow: 0 0 8px #F59E0B;
+}
+
+.qa-req-info {
+  font-size: 11px;
+  line-height: 1.45;
+  color: #E2E8F0;
+  margin: 0;
+}
+
+.qa-req-info strong {
+  color: #FCD34D;
+}
+
+.qa-studio-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(139, 92, 246, 0.25));
+  border: 1px solid rgba(0, 242, 254, 0.45);
+  color: #00F2FE;
+  padding: 6px 11px;
+  border-radius: 7px;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  width: fit-content;
+  margin-top: 2px;
+}
+
+.qa-studio-link-btn:hover {
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.35), rgba(139, 92, 246, 0.4));
+  border-color: #00F2FE;
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
+  transform: translateY(-1px);
+}
+
+.key-help-line {
+  font-size: 10px;
+  color: #CBD5E1;
+  margin-top: 4px;
+  line-height: 1.35;
+}
+
+.key-help-line a {
+  color: #38BDF8;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 700;
+}
+
+.key-help-line a:hover {
+  color: #00F2FE;
+}
+
+.req-tag {
+  color: #FCD34D;
+  font-size: 10px;
+}
+
+.req-tag a {
+  color: #00F2FE;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
